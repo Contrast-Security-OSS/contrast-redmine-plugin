@@ -20,12 +20,12 @@
 # SOFTWARE.
 
 Redmine::Plugin.register :contrastsecurity do
-  name 'Contrast plugin'
+  name 'Contrast Redmine Plugin'
   author 'Taka Shiozaki'
   description 'This is a Contrast plugin for Redmine'
   version '1.2.1'
-  url 'https://github.com/turbou/ContrastSecurity/tree/master/integration/redmine/contrastsecurity'
-  author_url 'https://github.com/turbou'
+  url 'https://github.com/Contrast-Security-OSS/contrast-redmine-plugin'
+  author_url 'https://github.com/Contrast-Security-OSS'
   settings :default => {
     'vul_issues' => true,
     'lib_issues' => true,
