@@ -12,10 +12,18 @@
   - 重大度（重大度に応じて、Redmineのチケットの優先度が同期されます）
 
 ### Steps
-1. ContrastSecurityプラグインを配置  
-  ```plugins/``` 直下にcontrastsecurityディレクトリを配置
-
-2. マイグレート  
+1. [Release](https://github.com/Contrast-Security-OSS/contrast-redmine-plugin/releases) から最新リリースのcontrast-redmine-plugin-x.x.x.tar.gz をダウンロードします。　　
+　　　　  
+    ```bash
+    wget https://github.com/Contrast-Security-OSS/contrast-redmine-plugin/releases/download/1.2.1/contrast-redmine-plugin-x.x.x.tar.gz
+    ```
+2. ContrastSecurityプラグインを配置  
+  Redmineのドキュメントルートが```/var/www/redmine```と想定  
+    ```bash
+    tar zxf contrast-redmine-plugin-x.x.x.tar.gz
+    mv contrast-redmine-plugin /var/www/redmine/plugins/
+    ```
+3. マイグレート  
     ```bash
     # インストール時
     bundle exec rake redmine:plugins:migrate
@@ -24,16 +32,16 @@
     ```
     Contrastプラグインのモデルを新たに作るわけではなく、デフォルトの選択肢（ステータス、優先度）、トラッカー、カスタムフィールドを作成します。
 
-3. ContrastSecurityプラグインを有効にします。  
+4. ContrastSecurityプラグインを有効にします。  
   Redmineを再起動してください。
 
-4. RedmineのRestAPIを有効にする  
+5. RedmineのRestAPIを有効にする  
   管理 -> 設定 -> APIで、「RESTによるWebサービスを有効にする」にチェックを入れる。
 
-5. TeamServerからwebhookを受けるユーザーのAPITokenを確認  
+6. TeamServerからwebhookを受けるユーザーのAPITokenを確認  
   個人設定 -> APIアクセスキーを表示で、APIトークンが表示されます。
 
-6. TeamServerのGeneric Webhookを設定  
+7. TeamServerのGeneric Webhookを設定  
     - Name: ```Redmine（好きな名前）```  
     - URL: ```http://[REDMINE_HOST]:[REDMINE_PORT]/redmine/contrast/vote?key=[API_TOKEN]```  
       サブディレクトリを使っていない場合は
@@ -70,11 +78,11 @@
   
     設定後、**テスト接続**を行って、保存してください。  
   
-7. Generic Webhookの設定後、Notfication（ベルマーク）を行ってください。  
+8. Generic Webhookの設定後、Notfication（ベルマーク）を行ってください。  
   Libraryも対象にすることでCVEを含むライブラリの情報もRedmineに連携されます。  
   「ステータス変更時に通知を受信」にチェックを入れることで、TeamServerのステータス変更についてもRedmine側に通知されます。（双方向同期）
 
-8. プラグインの設定（確認）を行います。
+9. プラグインの設定（確認）を行います。
     - TeamServer 接続設定  
       Contrast TeamServerのアカウントメニュー「あなたのアカウント」に必要な情報が揃ってるので、そこからコピーしてください。
     - チケット作成対象  
