@@ -12,16 +12,14 @@
   - 重大度（重大度に応じて、Redmineのチケットの優先度が同期されます）
 
 ### Steps
-1. [Release](https://github.com/Contrast-Security-OSS/contrast-redmine-plugin/releases) から最新リリースのcontrast-redmine-plugin-x.x.x.tar.gz をダウンロードします。　　
-　　　　  
-    ```bash
-    wget https://github.com/Contrast-Security-OSS/contrast-redmine-plugin/releases/download/1.2.1/contrast-redmine-plugin-x.x.x.tar.gz
-    ```
+1. [Release](https://github.com/Contrast-Security-OSS/contrast-redmine-plugin/releases) から最新リリースの**Source code**のzipまたはtar.gzファイルをダウンロードします。　　　
 2. ContrastSecurityプラグインを配置  
-  Redmineのドキュメントルートが```/var/www/redmine```と想定  
+  Redmineのドキュメントルートが```/var/www/redmine```と想定します。  
+  ダウンローしたファイルは、*contrast-redmine-plugin-x.x.x*のディレクトリ名で解凍されます。  
+  解凍されたディレクトリをRedmineのプラグインディレクトリに配置します。  
+  配置する際は```contrastsecurity```というディレクトリ名としてください。
     ```bash
-    tar zxf contrast-redmine-plugin-x.x.x.tar.gz
-    mv contrast-redmine-plugin /var/www/redmine/plugins/
+    mv contrast-redmine-plugin-x.x.x /var/www/redmine/plugins/contrastsecurity
     ```
 3. マイグレート  
     ```bash
