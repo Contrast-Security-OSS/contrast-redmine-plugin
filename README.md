@@ -1,6 +1,6 @@
 ## Redmine ContrastSecurity Plugin
 
-### Overview
+### 概要
 - Contrast TeamServerからのWebhookを受信して、Redmineにチケットを作成することができます。  
   脆弱性、CVEを含むライブラリの情報がRedmineに共有されます。
 - Redmineのチケットのステータスを変更すると、Contrast TeamServerに連携することができます。
@@ -11,7 +11,11 @@
   - 最終検出日時
   - 深刻度（深刻度に応じて、Redmineのチケットの優先度が同期されます）
 
-### Steps
+### 前提条件
+- TeamServerは3.8.3, 3.8.4, 3.8.5で動作確認済みです。
+- Redmineは3.4.6で動作確認済みです。
+
+### 導入手順
 1. [Release](https://github.com/Contrast-Security-OSS/contrast-redmine-plugin/releases) から最新リリースの**Source code**のzipまたはtar.gzファイルをダウンロードします。　　　
 2. ContrastSecurityプラグインを配置  
   Redmineのドキュメントルートが```/var/www/redmine```と想定します。  
