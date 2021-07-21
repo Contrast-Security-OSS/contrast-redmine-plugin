@@ -9,7 +9,7 @@
 - コメントについても相互に共有されます。ステータス変更時のコメントも同様です。
 - Redmineのチケットの詳細を表示する際に、Contrast TeamServerの以下の情報が自動で同期されます。  
   - 最終検出日時
-  - 重大度（重大度に応じて、Redmineのチケットの優先度が同期されます）
+  - 深刻度（深刻度に応じて、Redmineのチケットの優先度が同期されます）
 
 ### Steps
 1. [Release](https://github.com/Contrast-Security-OSS/contrast-redmine-plugin/releases) から最新リリースの**Source code**のzipまたはtar.gzファイルをダウンロードします。　　　
@@ -88,4 +88,4 @@
     - ステータスマッピング  
       Contrast TeamServer側のステータスとRedmine側のステータスの紐付けを設定します。
     - 優先度マッピング  
-      Contrast TeamServer側の脆弱性の**重大度**とRedmine側の**優先度**の紐付けを設定します。
+      Contrast TeamServer側の脆弱性の**深刻度**とRedmine側の**優先度**の紐付けを設定します。
