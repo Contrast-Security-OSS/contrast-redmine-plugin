@@ -31,7 +31,7 @@ module SettingsControllerPatch
   module InstanceMethods
     def plugin_with_validate
       @plugin = Redmine::Plugin.find(params[:id])
-      if @plugin.name != "Contrast plugin"
+      if @plugin.name != "Contrast Redmine Plugin"
         plugin = plugin_without_validate
         return plugin
       end
