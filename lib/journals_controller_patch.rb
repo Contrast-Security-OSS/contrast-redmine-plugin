@@ -20,50 +20,37 @@
 # SOFTWARE.
 
 module JournalsControllerPatch
-  def self.included(base)
-    base.send(:include, InstanceMethods)
-    base.class_eval do
-      unloadable
-      alias_method_chain :update, :sync
-    end
-  end
-
-  module InstanceMethods
-    def update_with_sync
-      notes = @journal.notes
-      @journal.safe_attributes = params[:journal]
-      if @journal.notes.blank? # コメントが削除された場合
-        issue = @journal.journalized
-        cv_org = CustomValue.where(customized_type: 'Issue').where(customized_id: issue.id).joins(:custom_field).where(custom_fields: {name: l('contrast_custom_fields.org_id')}).first
-        cv_app = CustomValue.where(customized_type: 'Issue').where(customized_id: issue.id).joins(:custom_field).where(custom_fields: {name: l('contrast_custom_fields.app_id')}).first
-        cv_vul = CustomValue.where(customized_type: 'Issue').where(customized_id: issue.id).joins(:custom_field).where(custom_fields: {name: l('contrast_custom_fields.vul_id')}).first
-        org_id = cv_org.try(:value)
-        app_id = cv_app.try(:value)
-        vul_id = cv_vul.try(:value)
-        if org_id.nil? || org_id.empty? || app_id.nil? || app_id.empty? || vul_id.nil? || vul_id.empty?
-          update = update_without_sync
-          return update
-        end
-        note_id = nil
-        @journal.details.each do |detail|
-          if detail.prop_key == "contrast_note_id"
-            note_id = detail.value
-          end
-        end
-        if note_id.blank?
-          update = update_without_sync
-          return update
-        end
-        teamserver_url = Setting.plugin_contrastsecurity['teamserver_url']
-        url = sprintf('%s/api/ng/%s/applications/%s/traces/%s/notes/%s?expand=skip_links', teamserver_url, org_id, app_id, vul_id, note_id)
-        res, msg = ContrastUtil.callAPI(url: url, method: "DELETE")
-        if res.present? && res.code == "200"
-          @journal.details = []
+  def update
+    notes = @journal.notes
+    @journal.safe_attributes = params[:journal]
+    if @journal.notes.blank? # コメントが削除された場合
+      issue = @journal.journalized
+      cv_org = CustomValue.where(customized_type: 'Issue').where(customized_id: issue.id).joins(:custom_field).where(custom_fields: {name: l('contrast_custom_fields.org_id')}).first
+      cv_app = CustomValue.where(customized_type: 'Issue').where(customized_id: issue.id).joins(:custom_field).where(custom_fields: {name: l('contrast_custom_fields.app_id')}).first
+      cv_vul = CustomValue.where(customized_type: 'Issue').where(customized_id: issue.id).joins(:custom_field).where(custom_fields: {name: l('contrast_custom_fields.vul_id')}).first
+      org_id = cv_org.try(:value)
+      app_id = cv_app.try(:value)
+      vul_id = cv_vul.try(:value)
+      if org_id.nil? || org_id.empty? || app_id.nil? || app_id.empty? || vul_id.nil? || vul_id.empty?
+        super
+      end
+      note_id = nil
+      @journal.details.each do |detail|
+        if detail.prop_key == "contrast_note_id"
+          note_id = detail.value
         end
       end
-      update = update_without_sync
-      return update
+      if note_id.blank?
+        super
+      end
+      teamserver_url = Setting.plugin_contrastsecurity['teamserver_url']
+      url = sprintf('%s/api/ng/%s/applications/%s/traces/%s/notes/%s?expand=skip_links', teamserver_url, org_id, app_id, vul_id, note_id)
+      res, msg = ContrastUtil.callAPI(url: url, method: "DELETE")
+      if res.present? && res.code == "200"
+        @journal.details = []
+      end
     end
+    super
   end
 end
-
+JournalsController.prepend(JournalsControllerPatch)

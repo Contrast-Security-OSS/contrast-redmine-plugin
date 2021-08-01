@@ -20,86 +20,72 @@
 # SOFTWARE.
 
 module SettingsControllerPatch
-  def self.included(base)
-    base.send(:include, InstanceMethods)
-    base.class_eval do
-      unloadable
-      alias_method_chain :plugin, :validate
+  def plugin
+    @plugin = Redmine::Plugin.find(params[:id])
+    if @plugin.name != "Contrast Redmine Plugin"
+      super
     end
-  end
-
-  module InstanceMethods
-    def plugin_with_validate
-      @plugin = Redmine::Plugin.find(params[:id])
-      if @plugin.name != "Contrast Redmine Plugin"
-        plugin = plugin_without_validate
-        return plugin
+    if request.post?
+      setting = params[:settings] ? params[:settings].permit!.to_h : {}
+      teamserver_url = setting['teamserver_url']
+      org_id = setting['org_id']
+      api_key = setting['api_key']
+      username = setting['username']
+      service_key = setting['service_key']
+      proxy_host = setting['proxy_host']
+      proxy_port = setting['proxy_port']
+      proxy_user = setting['proxy_user']
+      proxy_pass = setting['proxy_pass']
+      if teamserver_url.empty? || org_id.empty? || api_key.empty? || username.empty? || service_key.empty?
+        flash[:error] = l(:test_connect_fail)
+        redirect_to plugin_settings_path(@plugin) and return
       end
-
-      if request.post?
-        setting = params[:settings] ? params[:settings].permit!.to_h : {}
-        #Setting.send "plugin_#{@plugin.id}=", setting
-        teamserver_url = setting['teamserver_url']
-        org_id = setting['org_id']
-        api_key = setting['api_key']
-        username = setting['username']
-        service_key = setting['service_key']
-        proxy_host = setting['proxy_host']
-        proxy_port = setting['proxy_port']
-        proxy_user = setting['proxy_user']
-        proxy_pass = setting['proxy_pass']
-        if teamserver_url.empty? || org_id.empty? || api_key.empty? || username.empty? || service_key.empty?
+      url = sprintf('%s/api/ng/%s/applications/', teamserver_url, org_id)
+      res, msg = ContrastUtil.callAPI(
+        url: url, api_key: api_key, username: username, service_key: service_key,
+        proxy_host: proxy_host, proxy_port: proxy_port, proxy_user: proxy_user, proxy_pass: proxy_pass
+      )
+      if res.nil?
+        flash[:error] = msg
+        redirect_to plugin_settings_path(@plugin) and return
+      else
+        if res.code != "200"
           flash[:error] = l(:test_connect_fail)
           redirect_to plugin_settings_path(@plugin) and return
         end
-        url = sprintf('%s/api/ng/%s/applications/', teamserver_url, org_id)
-        res, msg = ContrastUtil.callAPI(
-          url: url, api_key: api_key, username: username, service_key: service_key,
-          proxy_host: proxy_host, proxy_port: proxy_port, proxy_user: proxy_user, proxy_pass: proxy_pass
-        )
-        if res.nil?
-          flash[:error] = msg
+      end
+      # ステータスマッピングチェック
+      statuses = []
+      statuses << setting['sts_reported']
+      statuses << setting['sts_suspicious']
+      statuses << setting['sts_confirmed']
+      statuses << setting['sts_notaproblem']
+      statuses << setting['sts_remediated']
+      statuses << setting['sts_fixed']
+      statuses.each do |status|
+        status_obj = IssueStatus.find_by_name(status)
+        if status_obj.nil?
+          flash[:error] = l(:status_settings_fail)
           redirect_to plugin_settings_path(@plugin) and return
-        else
-          if res.code != "200"
-            flash[:error] = l(:test_connect_fail)
-            redirect_to plugin_settings_path(@plugin) and return
-          end
-        end
-        # ステータスマッピングチェック
-        statuses = []
-        statuses << setting['sts_reported']
-        statuses << setting['sts_suspicious']
-        statuses << setting['sts_confirmed']
-        statuses << setting['sts_notaproblem']
-        statuses << setting['sts_remediated']
-        statuses << setting['sts_fixed']
-        statuses.each do |status|
-          status_obj = IssueStatus.find_by_name(status)
-          if status_obj.nil?
-            flash[:error] = l(:status_settings_fail)
-            redirect_to plugin_settings_path(@plugin) and return
-          end
-        end
-        # 優先度マッピングチェック
-        priorities = []
-        priorities << setting['pri_critical']
-        priorities << setting['pri_high']
-        priorities << setting['pri_medium']
-        priorities << setting['pri_low']
-        priorities << setting['pri_note']
-        priorities << setting['pri_cvelib']
-        priorities.each do |priority|
-          priority_obj = IssuePriority.find_by_name(priority)
-          if priority_obj.nil?
-            flash[:error] = l(:priority_settings_fail)
-            redirect_to plugin_settings_path(@plugin) and return
-          end
         end
       end
-      plugin = plugin_without_validate
-      return plugin
+      # 優先度マッピングチェック
+      priorities = []
+      priorities << setting['pri_critical']
+      priorities << setting['pri_high']
+      priorities << setting['pri_medium']
+      priorities << setting['pri_low']
+      priorities << setting['pri_note']
+      priorities << setting['pri_cvelib']
+      priorities.each do |priority|
+        priority_obj = IssuePriority.find_by_name(priority)
+        if priority_obj.nil?
+          flash[:error] = l(:priority_settings_fail)
+          redirect_to plugin_settings_path(@plugin) and return
+        end
+      end
     end
+    super
   end
 end
-
+SettingsController.prepend(SettingsControllerPatch)

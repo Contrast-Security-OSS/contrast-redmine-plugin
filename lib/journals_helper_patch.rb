@@ -20,57 +20,47 @@
 # SOFTWARE.
 
 module JournalsHelperPatch
-  def self.included(base)
-    base.send(:include, InstanceMethods)
-    base.class_eval do
-      unloadable
-      alias_method_chain :render_notes, :modify
-    end
-  end
-
-  module InstanceMethods
-    def render_notes_with_modify(issue, journal, options={})
-      render_notes = render_notes_without_modify(issue, journal, options)
-      last_updater_uid = nil 
-      last_updater = nil 
-      journal.details.each do |detail|
-        if detail.prop_key == "contrast_last_updater_uid"
-          last_updater_uid = detail.value
-        elsif detail.prop_key == "contrast_last_updater"
-          last_updater = detail.value
-        end 
+  def render_notes(issue, journal, options={})
+    render_notes = super(issue, journal, options)
+    last_updater_uid = nil 
+    last_updater = nil 
+    journal.details.each do |detail|
+      if detail.prop_key == "contrast_last_updater_uid"
+        last_updater_uid = detail.value
+      elsif detail.prop_key == "contrast_last_updater"
+        last_updater = detail.value
       end 
-      if last_updater_uid.blank?
-        # おそらくContrastと無関係なチケット
-        return render_notes
-      end
-      username = Setting.plugin_contrastsecurity['username']
-      if last_updater_uid != username
-        upd_tag = link_to(l(:button_edit),
-                          edit_journal_path(journal),
-                          :remote => true,
-                          :method => 'get',
-                          :title => l(:button_edit),
-                          :class => 'icon-only icon-edit'
-                         ).html_safe
-        del_tag = link_to(l(:button_delete),
-                          journal_path(journal, :journal => {:notes => ""}),
-                          :remote => true,
-                          :method => 'put', :data => {:confirm => l(:text_are_you_sure)}, 
-                          :title => l(:button_delete),
-                          :class => 'icon-only icon-del'
-                         ).html_safe
-        return render_notes.gsub(upd_tag, "").gsub(del_tag, "").gsub("</p></div>", "</p><i>by " + last_updater + "</i></div>").html_safe
-      else
-        exist_creator_pattern = /(\(by .+\))<\/p>/
-        is_exist_creator = render_notes.match(exist_creator_pattern)
-        if is_exist_creator
-          by_creator = is_exist_creator[1].gsub(/\(|\)/, "")
-          return render_notes.gsub(is_exist_creator[1], "").gsub("</p></div>", "</p><i>" + by_creator + "</i></div>").html_safe
-        end
-      end
+    end 
+    if last_updater_uid.blank?
+      # おそらくContrastと無関係なチケット
       return render_notes
     end
+    username = Setting.plugin_contrastsecurity['username']
+    if last_updater_uid != username
+      upd_tag = link_to(l(:button_edit),
+                        edit_journal_path(journal),
+                        :remote => true,
+                        :method => 'get',
+                        :title => l(:button_edit),
+                        :class => 'icon-only icon-edit'
+                       ).html_safe
+      del_tag = link_to(l(:button_delete),
+                        journal_path(journal, :journal => {:notes => ""}),
+                        :remote => true,
+                        :method => 'put', :data => {:confirm => l(:text_are_you_sure)}, 
+                        :title => l(:button_delete),
+                        :class => 'icon-only icon-del'
+                       ).html_safe
+      return render_notes.gsub(upd_tag, "").gsub(del_tag, "").gsub("</p></div>", "</p><i>by " + last_updater + "</i></div>").html_safe
+    else
+      exist_creator_pattern = /(\(by .+\))<\/p>/
+      is_exist_creator = render_notes.match(exist_creator_pattern)
+      if is_exist_creator
+        by_creator = is_exist_creator[1].gsub(/\(|\)/, "")
+        return render_notes.gsub(is_exist_creator[1], "").gsub("</p></div>", "</p><i>" + by_creator + "</i></div>").html_safe
+      end
+    end
+    return render_notes
   end
 end
-
+JournalsHelper.prepend(JournalsHelperPatch)
