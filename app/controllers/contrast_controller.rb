@@ -21,7 +21,7 @@
 
 class ContrastController < ApplicationController
   before_action :require_login
-  skip_before_filter :verify_authenticity_token
+  skip_before_action :verify_authenticity_token
   accept_api_auth :vote
 
   @@mutex = Thread::Mutex.new
