@@ -13,10 +13,11 @@
 
 ### 前提条件
 - TeamServerは3.8.3, 3.8.4, 3.8.5で動作確認済みです。
-- Redmineは3.4.6で動作確認済みです。
+- Redmineは3.4.6、4.2.2で動作確認済みです。
 
 ### 導入手順
-1. [Release](https://github.com/Contrast-Security-OSS/contrast-redmine-plugin/releases) から最新リリースの**Source code**のzipまたはtar.gzファイルをダウンロードします。　　　
+1. [Release](https://github.com/Contrast-Security-OSS/contrast-redmine-plugin/releases) から最新リリースの**Source code**のzipまたはtar.gzファイルをダウンロードします。  
+  Redmine3系と4系でダウンロードするバイナリが異なります。適したリリースバージョンからダウンロードしてください。
 2. ContrastSecurityプラグインを配置  
   Redmineのドキュメントルートが```/var/www/redmine```と想定します。  
   ダウンローしたファイルは、*contrast-redmine-plugin-x.x.x*のディレクトリ名で解凍されます。  
