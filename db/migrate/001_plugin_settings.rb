@@ -19,7 +19,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-class PluginSettings < ActiveRecord::Migration
+class PluginSettings < ActiveRecord::Migration[5.2]
 
   CUSTOM_FIELD_NAMES = [
     '【Contrast】ルール名',
