@@ -13,7 +13,7 @@
 
 ### 前提条件
 - TeamServerは3.8.3, 3.8.4, 3.8.5で動作確認済みです。
-- Redmineは3.4.6で動作確認済みです。
+- Redmineは3.4.6、4.2.2で動作確認済みです。
 
 ### 導入手順
 1. [Release](https://github.com/Contrast-Security-OSS/contrast-redmine-plugin/releases) から最新リリースの**Source code**のzipまたはtar.gzファイルをダウンロードします。　　　
