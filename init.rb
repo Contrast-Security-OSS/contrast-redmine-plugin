@@ -43,7 +43,7 @@ Redmine::Plugin.register :contrastsecurity do
     'pri_note' => '最低',
     'pri_cvelib' => '高'
   }, :partial => 'settings/contrast_settings'
-  require 'issue_hooks'
+  require File.expand_path('../lib/issue_hook', __FILE__)
 end
 
 Rails.configuration.to_prepare do
