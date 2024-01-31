@@ -85,12 +85,13 @@ class ContrastPayloadParser
   end
 
   def get_lib_info
-    lib_pattern = %r{index.html#/#{@org_id}/libraries/(.+)/([a-z0-9]+)\)}
+    #lib_pattern = %r{index.html#/#{@org_id}/libraries/(.+)/([a-z0-9]+)\)}
+    lib_pattern = %r{index.html#/#{@org_id}/libraries.+&activeRow=([a-z0-9]+)%7C([^&]+)&view}
     matched = @description.match(lib_pattern)
 
     if matched
-      @lib_id = matched[2]
-      return { 'lang' => matched[1], 'id' => matched[2] }
+      @lib_id = matched[1]
+      return { 'lang' => matched[2], 'id' => matched[1] }
     else
       return { 'lang' => '', 'id' => '' }
     end
@@ -98,8 +99,13 @@ class ContrastPayloadParser
 
   def get_lib_url
     lib_info = get_lib_info
-    lib_url_pattern = /.+\((.+#{lib_info['id']})\)/
-    @description.match(lib_url_pattern)[1]
+    lib_url_pattern = /.+\((.+#{lib_info['id']}.+).+\)/
+    matched = @description.match(lib_url_pattern)
+    if matched
+      matched[1]
+    else
+      ""
+    end
   end
 
   def set_vul_info_from_comment
